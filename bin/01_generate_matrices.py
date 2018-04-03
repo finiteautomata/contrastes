@@ -3,28 +3,13 @@ import fire
 import os
 import glob
 import json
-import re
 import nltk
-from nltk.tokenize import TweetTokenizer
 from collections import Counter, defaultdict
 import itertools
 import pandas as pd
 import multiprocessing
-urls = r'(?:https?\://t.co/[\w]+)'
+from contrastes.processing import tokenize
 
-tokenizer = TweetTokenizer(preserve_case=False, reduce_len=True, strip_handles=True)
-
-
-def mytokenize(text, only_alpha=True, remove_hashtags=True):
-    tokens = tokenizer.tokenize(text)
-
-    if only_alpha:
-        tokens = [tk for tk in tokens if tk.isalpha()]
-    else:
-        tokens = [tk for tk in tokens if tk[0] != "#"] if remove_hashtags else tokens
-        tokens = [tk for tk in tokens if not re.match(urls, tk)]
-    tokens = [re.sub(r'(.)\1\1+', r'\1\1', tk) for tk in tokens]
-    return tokens
 
 def get_counters_from_file(json_path):
     """
@@ -53,7 +38,7 @@ def get_counters_from_file(json_path):
 
     for tweet in tweets:
         text = tweet['text']
-        tokens = mytokenize(text)
+        tokens = tokenize(text)
         for token in tokens:
             fd[token] += 1
             users[token].add(tweet['user']['id'])
@@ -102,6 +87,8 @@ def generate_matrices(num_files=5):
         province_df = get_province_df(province, jsons)
 
         df = df.add(province_df, fill_value=.0)
+
+
     df.to_csv("matrix.csv")
 
 if __name__ == '__main__':
