@@ -1,5 +1,8 @@
 import re
 import itertools
+import json
+import multiprocessing
+import pandas as pd
 from collections import defaultdict
 from nltk.tokenize import TweetTokenizer
 from nltk import FreqDist
@@ -82,3 +85,25 @@ def merge_counters(fds, user_counters):
                 users[k] = users[k].union(users_freq[k])
 
     return fd, users
+
+
+def _get_counters_from_file(json_path):
+    return get_counters(json.load(open(json_path)))
+
+
+def build_province_df(province_name, jsons, no_workers=4):
+    """
+    Creates dataframe for a Province
+    """
+    pool = multiprocessing.Pool(no_workers, maxtasksperchild=1)
+
+    fds, user_counters = zip(*pool.map(_get_counters_from_file, jsons))
+    fd, users = merge_counters(fds, user_counters)
+
+    users_occurrences = {k:len(v) for k, v in users.items()}
+
+    occurrences_column = "{}_ocurrencias".format(province_name)
+    users_column = "{}_usuarios".format(province_name)
+
+    df = pd.DataFrame({occurrences_column: fd, users_column: users_occurrences})
+    return df
