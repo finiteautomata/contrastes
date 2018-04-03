@@ -1,13 +1,7 @@
 import unittest
 from contrastes.processing import get_counters
+from ..factories import build_tweet
 
-def build_tweet(text, user_id=111):
-    return {
-        "text": text,
-        "user": {
-            "id": str(user_id)
-        }
-    }
 
 class GetCountersTest(unittest.TestCase):
     def test_one_tweet_generate_freqdist_counts(self):
@@ -49,19 +43,14 @@ class GetCountersTest(unittest.TestCase):
             "especialmente": 1
         })
 
-    def test_two_tweets_users(self):
+    def test_tweets_with_repeated_letters(self):
         tweets = [
-            build_tweet("hola a todos, hola #BuenMiercoles", user_id="1234"),
-            build_tweet("hola amigos especialmente a @johndoe",
-                        user_id="12345")
+            build_tweet("holaaaaa", user_id="1234"),
+            build_tweet("holaaaaaaaaaa", user_id="1234"),
         ]
 
         _, users = get_counters(tweets)
 
         self.assertDictEqual(users, {
-            "hola": {"1234", "12345"},
-            "a": {"1234", "12345"},
-            "todos": {"1234"},
-            "especialmente": {"12345"},
-            "amigos": {"12345"},
+            "holaaa": {"1234"},
         })

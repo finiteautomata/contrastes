@@ -19,12 +19,10 @@ class TokenizeTest(unittest.TestCase):
     def test_remove_hashtags(self):
         text = "Mi época favorita es el #TerrorRojo"
 
-        self.assertEqual(tokenize(text), ["mi", "época", "favorita", "es", "el"])
-
-    def test_remove_hashtags(self):
-        text = "Mi época favorita es el #TerrorRojo"
-
-        self.assertEqual(tokenize(text), ["mi", "época", "favorita", "es", "el"])
+        self.assertEqual(
+            tokenize(text),
+            ["mi", "época", "favorita", "es", "el"]
+        )
 
     def test_remove_urls(self):
         text = "Por suerte no existía www.google.com"
@@ -35,3 +33,9 @@ class TokenizeTest(unittest.TestCase):
         text = "holaaaa a todossss"
 
         self.assertEqual(tokenize(text), ["holaaa", "a", "todosss"])
+
+    """Just put this test to document that this is expected behaviour..."""
+    def test_reduce_length_with_both_cases(self):
+        text = "AAAaaaaahhh"
+
+        self.assertEqual(tokenize(text), ["aaaaaahhh"])

@@ -13,6 +13,15 @@ Detección de palabras contrastivas en Español Argentino utilizando Twitter. Pr
 $ pip install -r requirements
 ```
 
+
+## Uso
+
+1. Generar matriz de ocurrencias
+
+```
+$ python bin/01_generate_matrices.py
+```
+
 ## Tests
 
 Para correr los tests, ejecutar:

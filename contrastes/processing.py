@@ -1,4 +1,5 @@
 import re
+import itertools
 from collections import defaultdict
 from nltk.tokenize import TweetTokenizer
 from nltk import FreqDist
@@ -53,4 +54,31 @@ def get_counters(tweets):
         for token in tokens:
             fd[token] += 1
             users[token].add(tweet['user']['id'])
+    return fd, users
+
+def merge_counters(fds, user_counters):
+    """
+    Takes as input the output of get_counters for multiple files and merge them
+
+    Parameters:
+    ----------
+
+    fds: list of nltk.FreqDist
+
+    user_counters: list of defaultdict(set)
+        Dictionaries containing users of given tokens
+
+    """
+    fd = FreqDist()
+    users = None
+
+    for (other_fd, users_freq) in zip(fds, user_counters):
+        fd += other_fd
+        if users is None:
+            users = users_freq
+        else:
+            # Tengo que mergear los dicts de aquellas existentes
+            for k in itertools.chain(users.keys(), users_freq.keys()):
+                users[k] = users[k].union(users_freq[k])
+
     return fd, users
