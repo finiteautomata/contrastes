@@ -22,6 +22,14 @@ $ pip install -r requirements
 $ python bin/01_generate_matrices.py
 ```
 
+Si queremos generar una matriz de "juguete"
+
+
+```
+$ python bin/01_generate_matrices.py --num-files 4 --output-path "output/test.csv"
+```
+
+
 ## Tests
 
 Para correr los tests, ejecutar:
