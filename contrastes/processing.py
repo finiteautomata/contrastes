@@ -3,6 +3,7 @@ import itertools
 import json
 import multiprocessing
 import pandas as pd
+from contextlib import closing
 from collections import defaultdict
 from nltk.tokenize import TweetTokenizer
 from nltk import FreqDist
@@ -95,9 +96,8 @@ def build_province_df(province_name, jsons, no_workers=4):
     """
     Creates dataframe for a Province
     """
-    pool = multiprocessing.Pool(no_workers, maxtasksperchild=1)
-
-    fds, user_counters = zip(*pool.map(_get_counters_from_file, jsons))
+    with closing(multiprocessing.Pool(no_workers, maxtasksperchild=1)) as pool:
+        fds, user_counters = zip(*pool.map(_get_counters_from_file, jsons))
     fd, users = merge_counters(fds, user_counters)
 
     users_occurrences = {k:len(v) for k, v in users.items()}
@@ -105,5 +105,9 @@ def build_province_df(province_name, jsons, no_workers=4):
     occurrences_column = "{}_ocurrencias".format(province_name)
     users_column = "{}_usuarios".format(province_name)
 
-    df = pd.DataFrame({occurrences_column: fd, users_column: users_occurrences})
+    df = pd.DataFrame({
+        occurrences_column: fd,
+        users_column: users_occurrences
+    })
+
     return df
