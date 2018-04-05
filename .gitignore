@@ -103,3 +103,4 @@ ENV/
 # Custom míos
 
 data/*
+output/*
