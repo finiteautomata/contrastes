@@ -12,7 +12,24 @@ from nltk import word_tokenize
 
 
 def shuffle(balls, bins):
-    return multinomial(balls, [1. / bins] * bins)
+    """
+    Return a list of <bins> integers that sum <balls>.
+    We can think this as a problem of bosons:
+
+
+    Parameters:
+    ----------
+    balls: int > 0
+        number of balls to distribute
+    bins: int > 0
+        number of bins
+    Returns
+    -------
+    A list of <bins> integers that sum <balls>
+    """
+
+    probabilities = [1. / bins] * bins
+    return multinomial(balls, probabilities)
 
 
 
