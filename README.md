@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/finiteautomata/contrastes.svg?branch=master)](https://travis-ci.org/finiteautomata/contrastes)
+
 # Contrastes
 
 Detección de palabras contrastivas en Español Argentino utilizando Twitter. Proyecto en colaboración con la Academia Argentina de Letras
