@@ -34,7 +34,7 @@ def shuffle(balls, bins):
 
 
 
-def simulated_shuffled_entropy(n, p):
+def shuffled_entropy(n, p):
     """Calculate simulated-shuffled entropy.
 
     Parameters
