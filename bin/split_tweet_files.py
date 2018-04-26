@@ -40,8 +40,8 @@ def split_tweet_files(path, chunk_size=50000):
             json.dump(chunk, open(newfile, "w"))
             print(newfile)
 
-
         print(json_path)
+
 
 if __name__ == '__main__':
     fire.Fire(split_tweet_files)
