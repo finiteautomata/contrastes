@@ -13,6 +13,12 @@ Detección de palabras contrastivas en Español Argentino utilizando Twitter. Pr
 2. Instalar dependencias
 
 ```
+$ sudo apt install libhunspell-dev hunspell-es
+```
+
+2. Instalar dependencias
+
+```
 $ pip install -r requirements
 ```
 
