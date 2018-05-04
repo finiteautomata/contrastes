@@ -12,4 +12,5 @@ def read_occurrence_dataframe(path):
     df["cant_palabra"] = df[cant_palabras].sum(axis=1)
     df["cant_usuarios"] = df[cant_personas].sum(axis=1)
 
+    df = df.loc[df.index.notnull()]
     return df
