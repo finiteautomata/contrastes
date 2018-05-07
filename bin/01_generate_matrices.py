@@ -1,4 +1,3 @@
-"""Split ill-formed and heavy JSON into many smaller files."""
 import fire
 import os
 import glob
