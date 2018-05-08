@@ -3,7 +3,7 @@
 import nltk
 import json
 import random
-
+import numpy as np
 from scipy.stats import entropy
 from nltk.corpus import stopwords, gutenberg
 from numpy.random import multinomial
@@ -32,8 +32,6 @@ def shuffle(balls, bins):
     return multinomial(balls, probabilities)
 
 
-
-
 def shuffled_entropy(n, p):
     """Calculate simulated-shuffled entropy.
 
@@ -47,3 +45,13 @@ def shuffled_entropy(n, p):
     """
     shuffled_words = shuffle(balls=n, bins=p)
     return entropy(shuffled_words)
+
+
+def information_value(df, occurrence_column, columns):
+    entr = df[columns].apply(entropy, axis=1, raw=True)
+    delta = np.log(len(columns)) - entr
+
+    log_occ = np.log(df[occurrence_column])
+    norm_p = log_occ / log_occ.max()
+
+    return norm_p * delta

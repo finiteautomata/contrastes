@@ -7,17 +7,7 @@ import fire
 import numpy as np
 from scipy.stats import entropy
 from contrastes import read_occurrence_dataframe
-
-def calculate_information_value(df, occurrence_column, columns):
-    entr = df[columns].apply(entropy, axis=1, raw=True)
-    delta = np.log(23) - entr
-
-    log_occ = np.log(df[occurrence_column])
-    norm_p = log_occ / log_occ.max()
-
-    return norm_p * delta
-
-
+from contrastes.information_value import information_value
 
 def generate_lists(
     input_path="output/provinces_words.csv",
@@ -32,8 +22,8 @@ def generate_lists(
     """
     df = read_occurrence_dataframe(input_path, filter_words=True)
 
-    df["ival_palabras"] = calculate_information_value(df, "cant_palabra", df.cant_palabras)
-    df["ival_personas"] = calculate_information_value(df, "cant_usuarios", df.cant_personas)
+    df["ival_palabras"] = information_value(df, "cant_palabra", df.cant_palabras)
+    df["ival_personas"] = information_value(df, "cant_usuarios", df.cant_personas)
     df["ival"] = df["ival_palabras"] * df["ival_personas"]
 
 
