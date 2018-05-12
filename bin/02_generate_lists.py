@@ -6,7 +6,7 @@ Note: see https://github.com/daleman/tesis/blob/master/notebooks/info.ipynb
 import fire
 from contrastes import read_occurrence_dataframe
 from contrastes.information_value import information_value
-
+from contrastes.geo import region
 
 def generate_lists(
     input_path="output/provinces_words.csv",
@@ -21,11 +21,13 @@ def generate_lists(
     """
     df = read_occurrence_dataframe(input_path, filter_words=True)
 
+    print("Calculating entropy, regions, and stuff...")
     df["ival_palabras"] = information_value(df, "cant_palabra",
                                             df.cant_palabras)
     df["ival_personas"] = information_value(df, "cant_usuarios",
                                             df.cant_personas)
     df["ival"] = df["ival_palabras"] * df["ival_personas"]
+    df["region"] = df[df.cant_personas].apply(region, axis=1)
 
     columns = [
         "cant_palabra",
