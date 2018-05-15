@@ -9,6 +9,69 @@ from contrastes import read_occurrence_dataframe
 from contrastes.information_value import information_value
 from contrastes.geo import region
 
+def add_info(df):
+    """
+    Add information value and other stuff
+    """
+    print("Calculating entropy, regions, and stuff...")
+    df["ival_palabras"] = information_value(df, "cant_palabra",
+                                            df.cant_palabras)
+    df["ival_personas"] = information_value(df, "cant_usuarios",
+                                            df.cant_personas)
+    df["ival"] = df["ival_palabras"] * df["ival_personas"]
+    df["region"] = df[df.cant_personas].apply(region, axis=1)
+
+
+def save_lists(lists, columns, output_path):
+    """
+    Save lists.
+
+    Arguments:
+    ---------
+
+    lists: dict of (str, pandas.DataFrame)
+
+        Map from list name to proper list.
+
+    columns: list of strings
+        Columns to save in 'shortened mode'
+    """
+
+
+    for k, df_sorted in lists.items():
+        """
+        Saving two kind of lists: one with just a few columns, and other complete
+
+        This is in order to "debug" if there is any kind of problem...
+        """
+        for limit in [1000, 5000]:
+            output_file = os.path.join(
+                output_path,
+                "listado_{}_{}.csv".format(k, limit)
+            )
+
+            output_complete_file = os.path.join(
+                output_path,
+                "listado_{}_{}_completo.csv".format(k, limit)
+            )
+
+            print("Generating {}".format(output_file))
+            df_sorted[:limit].to_csv(
+                output_file,
+                index_label="palabra",
+                columns=columns
+            )
+
+            print("Generating {}".format(output_complete_file))
+
+            df_sorted[:limit].to_csv(
+                output_complete_file,
+                index_label="palabra",
+                columns=columns + list(df_sorted.columns.difference(columns))
+            )
+
+
+
 
 def generate_lists(
     input_path="output/provinces_words.csv",
@@ -25,44 +88,25 @@ def generate_lists(
     print("Loading words from {}".format(input_path))
     df = read_occurrence_dataframe(input_path, filter_words=True)
 
-    print("Calculating entropy, regions, and stuff...")
-    df["ival_palabras"] = information_value(df, "cant_palabra",
-                                            df.cant_palabras)
-    df["ival_personas"] = information_value(df, "cant_usuarios",
-                                            df.cant_personas)
-    df["ival"] = df["ival_palabras"] * df["ival_personas"]
-    df["region"] = df[df.cant_personas].apply(region, axis=1)
-
-    # These are the important columns. Should be first
-    columns = [
-        "cant_palabra",
-        "cant_usuarios",
-        "posicion",
-        "region"
-    ]
+    add_info(df)
 
     lists = {
-        "personas": df.sort_values("ival_personas", ascending=False),
-        "palabras": df.sort_values("ival_palabras", ascending=False),
-        "palabras_personas": df.sort_values("ival", ascending=False)
-
+        "personas": df.sort_values("ival_personas", ascending=False).copy(),
+        "palabras": df.sort_values("ival_palabras", ascending=False).copy(),
+        "palabras_personas": df.sort_values("ival", ascending=False).copy()
     }
 
-    for k, df_sorted in lists.items():
-        df_sorted["posicion"] = range(1, len(df)+1)
-        for limit in [1000, 5000]:
-            output_file = os.path.join(
-                output_path,
-                "listado_{}_{}.csv".format(k, limit)
-            )
 
-            print("Generating {}".format(output_file))
-
-            df_sorted[:limit].to_csv(
-                output_file,
-                index_label="palabra",
-                columns=columns + list(df_sorted.columns.difference(columns))
-            )
+    save_lists(
+        lists,
+        columns = [
+            "cant_palabra",
+            "cant_usuarios",
+            "posicion",
+            "region"
+        ],
+        output_path=output_path
+    )
 
 
 if __name__ == '__main__':
