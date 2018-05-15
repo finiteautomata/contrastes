@@ -1,4 +1,8 @@
 """Geographical functions for words."""
+import nltk
+import json
+
+
 def region(word_series, threshold=0.95):
     """Given a pandas series representing a word, return the region the word is used more in.
 
@@ -27,3 +31,21 @@ def region(word_series, threshold=0.95):
             break
 
     return [p.split("_")[0] for p in provs]
+
+
+def places():
+    with open('data/localidades/cabeceras.geojson') as cab,\
+         open('data/localidades/capitales.geojson') as cap,\
+         open('data/localidades/localidades.geojson') as loc,\
+         open('data/localidades/departamentos.geojson') as dep:
+        cabeceras = json.load(cab)
+        capitales = json.load(cap)
+        localidades = json.load(loc)
+        departamentos = json.load(dep)
+        lugares = set([])
+        for a in [cabeceras, capitales, localidades, departamentos]:
+            for n in a['features']:
+                for w in nltk.word_tokenize(n['properties']['nombre']):
+                    lugares.add(w.lower())
+
+    return lugares
