@@ -7,19 +7,23 @@ import fire
 import os
 from contrastes import read_occurrence_dataframe
 from contrastes.information_value import information_value
-from contrastes.geo import region
+from contrastes.geo import region, places
 
 def add_info(df):
     """
     Add information value and other stuff
     """
     print("Calculating entropy, regions, and stuff...")
+    lugares = places()
+
     df["ival_palabras"] = information_value(df, "cant_palabra",
                                             df.cant_palabras)
     df["ival_personas"] = information_value(df, "cant_usuarios",
                                             df.cant_personas)
     df["ival"] = df["ival_palabras"] * df["ival_personas"]
     df["region"] = df[df.cant_personas].apply(region, axis=1)
+    df["es_lugar"] = df.index.map(lambda w: w in lugares)
+
 
 
 def save_lists(lists, columns, output_path):
@@ -103,7 +107,8 @@ def generate_lists(
             "cant_palabra",
             "cant_usuarios",
             "posicion",
-            "region"
+            "region",
+            "es_lugar",
         ],
         output_path=output_path
     )
