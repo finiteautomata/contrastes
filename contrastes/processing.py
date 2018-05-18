@@ -136,7 +136,7 @@ def read_occurrence_dataframe(path, filter_words=None):
     df = df.loc[df.index.notnull()]
 
     if filter_words:
-        min_words, min_users = 100, 25
+        min_words, min_users = 40, 25
         if isinstance(filter_words, tuple):
             min_words = filter_words[0]
             min_users = filter_words[1]
