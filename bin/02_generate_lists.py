@@ -5,9 +5,17 @@ Note: see https://github.com/daleman/tesis/blob/master/notebooks/info.ipynb
 
 import fire
 import os
+import pandas as pd
 from contrastes import read_occurrence_dataframe
 from contrastes.information_value import information_value
 from contrastes.geo import region, places
+
+
+def get_label():
+    labeled_df = pd.read_csv("data/listado_definitivo.csv", index_col=0)
+    label = labeled_df["Palabra Candidata"].copy()
+    label[label == "0,5"] = "0.5"
+    return label.astype("float")
 
 def add_info(df):
     """
@@ -23,7 +31,7 @@ def add_info(df):
     df["ival"] = df["ival_palabras"] * df["ival_personas"]
     df["region"] = df[df.cant_personas].apply(region, axis=1)
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
-
+    df["etiqueta"] = get_label()
 
 
 def save_lists(lists, columns, output_path):
@@ -95,9 +103,9 @@ def generate_lists(
     add_info(df)
 
     lists = {
-        "personas": df.sort_values("ival_personas", ascending=False).copy(),
-        "palabras": df.sort_values("ival_palabras", ascending=False).copy(),
-        "palabras_personas": df.sort_values("ival", ascending=False).copy()
+        "abc": df.sort_values("ival_personas", ascending=False).copy(),
+        "def": df.sort_values("ival_palabras", ascending=False).copy(),
+        "ghi": df.sort_values("ival", ascending=False).copy()
     }
 
 
