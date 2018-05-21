@@ -22,7 +22,12 @@ def add_info(df):
                                             df.cant_palabras)
     df["ival_personas"] = information_value(df, "cant_usuarios",
                                             df.cant_personas)
-    df["ival"] = df["ival_palabras"] * df["ival_personas"]
+    df["ival_palper"] = df["ival_palabras"] * df["ival_personas"]
+
+    df["rank_palabras"] = df["ival_palabras"].rank(ascending=False)
+    df["rank_personas"] = df["ival_personas"].rank(ascending=False)
+    df["rank_palper"] = df["ival_palper"].rank(ascending=False)
+
     df["region"] = df[df.cant_personas].apply(region, axis=1)
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
     df["etiqueta"] = get_label()

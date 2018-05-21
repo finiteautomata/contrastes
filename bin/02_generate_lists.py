@@ -73,14 +73,17 @@ def generate_lists(
         Path to word-provinces matrix
     """
     print("Loading words from {}".format(input_path))
+
     df = read_occurrence_dataframe(input_path, filter_words=True)
 
     add_info(df)
 
+    df.to_csv(os.path.join(output_path, "listado_completo.csv"))
+
     lists = {
         "abc": df.sort_values("ival_personas", ascending=False).copy(),
         "def": df.sort_values("ival_palabras", ascending=False).copy(),
-        "ghi": df.sort_values("ival", ascending=False).copy()
+        "ghi": df.sort_values("ival_palper", ascending=False).copy()
     }
 
 
