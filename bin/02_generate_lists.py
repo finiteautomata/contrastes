@@ -5,59 +5,47 @@ Note: see https://github.com/daleman/tesis/blob/master/notebooks/info.ipynb
 
 import fire
 import os
-import pandas as pd
 from contrastes import read_occurrence_dataframe
-from contrastes.information_value import information_value
-from contrastes.geo import region, places
 from contrastes.lists import add_info
 
-def save_lists(lists, columns, output_path):
+
+def save_lists(df, columns, output_path):
     """
     Save lists.
 
     Arguments:
     ---------
 
-    lists: dict of (str, pandas.DataFrame)
-
-        Map from list name to proper list.
+    df: pandas.DataFrame
+        Occurrence dataframe, with added info
 
     columns: list of strings
         Columns to save in 'shortened mode'
     """
 
+    word_list = df[(df.rank_palabras <= 1000) |\
+                   (df.rank_personas <= 1000) |\
+                   (df.rank_palper <= 1000)]
 
-    for k, df_sorted in lists.items():
-        """
-        Saving two kind of lists: one with just a few columns, and other complete
+    print("Lists of first 1000 words")
+    print("Number of total words (without repetition): {}".format(len(word_list)))
 
-        This is in order to "debug" if there is any kind of problem...
-        """
-        for limit in [1000, 5000]:
-            output_file = os.path.join(
-                output_path,
-                "listado_{}_{}.csv".format(k, limit)
-            )
+    not_labeled = word_list[word_list.etiqueta.isna()]
 
-            output_complete_file = os.path.join(
-                output_path,
-                "listado_{}_{}_completo.csv".format(k, limit)
-            )
+    print("Not labeled:{} palabras".format(not_labeled.shape[0]))
+    print("Those of which {} are places".format(sum(not_labeled.es_lugar)))
 
-            print("Generating {}".format(output_file))
-            df_sorted[:limit].to_csv(
-                output_file,
-                index_label="palabra",
-                columns=columns
-            )
+    complete_path = os.path.join(output_path, "1000_no_etiquetadas_completo.csv")
+    reduced_path = os.path.join(output_path, "1000_no_etiquetadas_random_reducido.csv")
 
-            print("Generating {}".format(output_complete_file))
+    reordered_columns = columns + list(not_labeled.columns.difference(columns))
 
-            df_sorted[:limit].to_csv(
-                output_complete_file,
-                index_label="palabra",
-                columns=columns + list(df_sorted.columns.difference(columns))
-            )
+    not_labeled.to_csv(complete_path,
+                       columns=reordered_columns)
+    print("Not labeled full list saved to {}".format(complete_path))
+    # This shuffles the dataframe
+    not_labeled.sample(frac=1).to_csv(reduced_path, columns=columns)
+    print("Not labeled shuffled reduced list saved to {}".format(reduced_path))
 
 
 def generate_lists(
@@ -80,25 +68,11 @@ def generate_lists(
 
     df.to_csv(os.path.join(output_path, "listado_completo.csv"))
 
-    lists = {
-        "abc": df.sort_values("ival_personas", ascending=False).copy(),
-        "def": df.sort_values("ival_palabras", ascending=False).copy(),
-        "ghi": df.sort_values("ival_palper", ascending=False).copy()
-    }
-
-
     save_lists(
-        lists,
-        columns = [
-            "cant_palabra",
-            "cant_usuarios",
-            "posicion",
-            "region",
-            "es_lugar",
-        ],
-        output_path=output_path
+        df,
+        ["region", "es_lugar"],
+        output_path
     )
-
 
 if __name__ == '__main__':
     fire.Fire(generate_lists)
