@@ -9,7 +9,7 @@ from contrastes import read_occurrence_dataframe
 from contrastes.lists import add_info
 
 
-def save_lists(df, columns, output_path):
+def save_lists(df, output_path):
     """
     Save lists.
 
@@ -18,20 +18,24 @@ def save_lists(df, columns, output_path):
 
     df: pandas.DataFrame
         Occurrence dataframe, with added info
-
-    columns: list of strings
-        Columns to save in 'shortened mode'
     """
 
     word_list = df[(df.rank_palabras <= 1000) |\
                    (df.rank_personas <= 1000) |\
                    (df.rank_palper <= 1000)]
 
+    not_labeled = word_list[word_list.etiqueta.isna()].copy()
+
+    # Add extra info
+    not_labeled["lugar"] = not_labeled.es_lugar.apply(
+        lambda w: "lugar" if w else "ok"
+    )
+    not_labeled["provincias_sin_esa_palabra"] = 23 - not_labeled.cant_provincias
+
+    columns=["region", "lugar", "provincias_sin_esa_palabra"]
+
     print("Lists of first 1000 words")
     print("Number of total words (without repetition): {}".format(len(word_list)))
-
-    not_labeled = word_list[word_list.etiqueta.isna()]
-
     print("Not labeled:{} palabras".format(not_labeled.shape[0]))
     print("Those of which {} are places".format(sum(not_labeled.es_lugar)))
 
@@ -44,7 +48,13 @@ def save_lists(df, columns, output_path):
                        columns=reordered_columns)
     print("Not labeled full list saved to {}".format(complete_path))
     # This shuffles the dataframe
-    not_labeled.sample(frac=1).to_csv(reduced_path, columns=columns)
+    shuffled = not_labeled.sample(frac=1).copy()
+
+
+    shuffled.to_csv(
+        reduced_path,
+        columns=columns
+    )
     print("Not labeled shuffled reduced list saved to {}".format(reduced_path))
 
 
@@ -70,7 +80,6 @@ def generate_lists(
 
     save_lists(
         df,
-        ["region", "es_lugar"],
         output_path
     )
 
