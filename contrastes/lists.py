@@ -14,12 +14,26 @@ def get_label():
 
 
 def _add_fnorm(df):
+    fnorm_cols = []
     for col in df.cant_palabras:
         total_sum = df[col].sum()
         prov = col.split("_")[0]
+
         fnorm_col = "fnorm_{}".format(prov)
+        fnorm_cols.append(fnorm_col)
 
         df[fnorm_col] = df[col] * (1000000.0 / total_sum)
+
+    df["fnorm_max"] = df[fnorm_cols].max(axis=1)
+    df["prov_max"] = df[fnorm_cols].idxmax(axis=1)
+    df["prov_max"] = df["prov_max"].apply(lambda w: w.split("_")[1])
+    # This is the minimum of nonzero columns
+    df["fnorm_min"] = df[fnorm_cols][df > 0].min(axis=1)
+    df["prov_min"] = df[fnorm_cols][df > 0].idxmin(axis=1)
+    df["prov_min"] = df["prov_min"].apply(lambda w: w.split("_")[1])
+
+    df["max_dif"] = df["fnorm_max"] / df["fnorm_min"]
+
 
 
 def _add_ival(df):
@@ -47,6 +61,7 @@ def add_info(df):
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
     df["etiqueta"] = get_label()
     _add_fnorm(df)
+    df["provincias_sin_esa_palabra"] = 23 - df["cant_provincias"]
 
 
 def save_unlabeled_list(df, output_path, threshold=1000):
@@ -70,9 +85,6 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     not_labeled["lugar"] = not_labeled.es_lugar.apply(
         lambda w: "lugar" if w else "ok"
     )
-
-    not_labeled["provincias_sin_esa_palabra"] = 23 -\
-        not_labeled.cant_provincias
 
     columns = ["region", "lugar", "provincias_sin_esa_palabra"]
 
