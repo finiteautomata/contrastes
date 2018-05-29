@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from .information_value import information_value
 from .geo import places, region
+from . import argentina
 
 def get_label():
     """
@@ -55,13 +56,14 @@ def add_info(df):
     print("Calculating entropy, regions, and stuff...")
     _add_ival(df)
 
+    df["provincias_sin_esa_palabra"] = 23 - df["cant_provincias"]
     df["region"] = df[df.cant_personas].apply(region, axis=1)
 
     lugares = places()
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
     df["etiqueta"] = get_label()
     _add_fnorm(df)
-    df["provincias_sin_esa_palabra"] = 23 - df["cant_provincias"]
+
 
 
 def save_unlabeled_list(df, output_path, threshold=1000):
@@ -121,7 +123,7 @@ def save_info_by_provinces(df, output_path):
     def is_prov_fnorm(col):
         return "fnorm_" in col and "min" not in col and "max" not in col
 
-    fnorm_cols = [col for col in df.columns if is_prov_fnorm(col)]
+    fnorm_cols = ["fnorm_{}".format(prov) for prov in argentina.provinces]
     assert(len(fnorm_cols) == 23)
 
     column_order = df.cant_palabras + ["cant_palabra"] +\
@@ -151,3 +153,6 @@ def save_info_by_provinces(df, output_path):
     df.to_csv(resumed_csv_path, columns=resumed_order)
 
     print("Resumed list saved to {}".format(resumed_csv_path))
+
+def save_info_by_regions(df, output_path):
+    pass
