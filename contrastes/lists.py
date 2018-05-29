@@ -113,3 +113,41 @@ def save_unlabeled_list(df, output_path, threshold=1000):
         columns=columns
     )
     print("Not labeled shuffled reduced list saved to {}".format(reduced_path))
+
+
+def save_info_by_provinces(df, output_path):
+    print("Generating additional lists")
+
+    def is_prov_fnorm(col):
+        return "fnorm_" in col and "min" not in col and "max" not in col
+
+    fnorm_cols = [col for col in df.columns if is_prov_fnorm(col)]
+    assert(len(fnorm_cols) == 23)
+
+    column_order = df.cant_palabras + ["cant_palabra"] +\
+        df.cant_personas + ["cant_usuarios"] +\
+        fnorm_cols + ["provincias_sin_esa_palabra"] +\
+        ["fnorm_max", "prov_max", "fnorm_min", "prov_min", "max_dif"]
+
+    extended_csv_path = os.path.join(
+        output_path,
+        "provincias_contraste_extendido.csv"
+    )
+
+    df.to_csv(extended_csv_path, columns=column_order)
+
+    print("List saved to {}".format(extended_csv_path))
+
+    resumed_order = [
+        "fnorm_max", "prov_max", "fnorm_min", "prov_min", "max_dif",
+        "provincias_sin_esa_palabra", "cant_usuarios"
+    ]
+
+    resumed_csv_path = os.path.join(
+        output_path,
+        "provincias_contraste_resumido.csv"
+    )
+
+    df.to_csv(resumed_csv_path, columns=resumed_order)
+
+    print("Resumed list saved to {}".format(resumed_csv_path))
