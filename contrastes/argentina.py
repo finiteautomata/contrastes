@@ -26,12 +26,14 @@ provinces = [
     'tucuman',
 ]
 
-regiones = {
+# Regions proposed by Vidal de Battini "El Español en la Argentina"
+
+regions = {
     "litoral": ['santacruz', 'tierradelfuego', 'chubut', 'rionegro',
                 'neuquen', 'lapampa', 'buenosaires', 'santafe', 'entrerios'],
-    "cuyo": ['mendoza'],
+    "cuyo": ['mendoza', 'sanjuan'],
     "central": ['sanluis', 'cordoba'],
     "guaranitica": ['corrientes', 'misiones', 'chaco', 'formosa'],
     "noroeste": ['santiago', 'larioja', 'catamarca',
-                 'sanjuan', 'jujuy', 'salta', 'tucuman'],
+                 'jujuy', 'salta', 'tucuman'],
 }

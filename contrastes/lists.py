@@ -4,6 +4,7 @@ from .information_value import information_value
 from .geo import places, region
 from . import argentina
 
+
 def get_label():
     """
     Get pd.Series of labeled data.
@@ -14,16 +15,21 @@ def get_label():
     return label.astype("float")
 
 
+def _fnorm(df, col):
+    total_sum = df[col].sum()
+    return df[col] * (1000000.0 / total_sum)
+
+
 def _add_fnorm(df):
+    print("Adding fnorms...")
     fnorm_cols = []
     for col in df.cant_palabras:
-        total_sum = df[col].sum()
         prov = col.split("_")[0]
 
         fnorm_col = "fnorm_{}".format(prov)
         fnorm_cols.append(fnorm_col)
 
-        df[fnorm_col] = df[col] * (1000000.0 / total_sum)
+        df[fnorm_col] = _fnorm(df, col)
 
     df["fnorm_max"] = df[fnorm_cols].max(axis=1)
     df["prov_max"] = df[fnorm_cols].idxmax(axis=1)
@@ -36,14 +42,40 @@ def _add_fnorm(df):
     df["max_dif"] = df["fnorm_max"] / df["fnorm_min"]
 
 
+def _add_regional_info(df):
+    """Add info for regions (Cuyo, Guaranitica, etc)."""
+    fnorm_cols = []
+    for region, provinces in argentina.regions.items():
+        occ_cols = ["{}_ocurrencias".format(prov) for prov in provinces]
+        user_cols = ["{}_usuarios".format(prov) for prov in provinces]
+
+        occ_col = "{}_ocurrencias".format(region)
+        fnorm_col = "fnorm_{}".format(region)
+        fnorm_cols.append(fnorm_col)
+
+        df[occ_col] = df[occ_cols].sum(axis=1)
+        df[fnorm_col] = _fnorm(df, occ_col)
+        df["{}_usuarios".format(region)] = df[user_cols].sum(axis=1)
+
+    df["fnorm_region_max"] = df[fnorm_cols].max(axis=1)
+    df["region_max"] = df[fnorm_cols].idxmax(axis=1)
+    df["region_max"] = df["region_max"].apply(lambda w: w.split("_")[1])
+    # This is the minimum of nonzero columns
+    df["fnorm_region_min"] = df[fnorm_cols][df > 0].min(axis=1)
+    df["region_min"] = df[fnorm_cols][df > 0].idxmin(axis=1)
+    df["region_min"] = df["region_min"].apply(lambda w: w.split("_")[1])
+
+    df["max_dif_region"] = df["fnorm_region_max"] / df["fnorm_region_min"]
 
 def _add_ival(df):
+    print("Calculating information values...")
     df["ival_palabras"] = information_value(df, "cant_palabra",
                                             df.cant_palabras)
     df["ival_personas"] = information_value(df, "cant_usuarios",
                                             df.cant_personas)
     df["ival_palper"] = df["ival_palabras"] * df["ival_personas"]
 
+    print("Calculating ranks...")
     df["rank_palabras"] = df["ival_palabras"].rank(ascending=False)
     df["rank_personas"] = df["ival_personas"].rank(ascending=False)
     df["rank_palper"] = df["ival_palper"].rank(ascending=False)
@@ -53,7 +85,6 @@ def add_info(df):
     """
     Add information value and other stuff
     """
-    print("Calculating entropy, regions, and stuff...")
     _add_ival(df)
 
     df["provincias_sin_esa_palabra"] = 23 - df["cant_provincias"]
@@ -63,6 +94,7 @@ def add_info(df):
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
     df["etiqueta"] = get_label()
     _add_fnorm(df)
+    _add_regional_info(df)
 
 
 
@@ -76,7 +108,8 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     df: pandas.DataFrame
         Occurrence dataframe, with added info
     """
-
+    print("="*40)
+    print("Saving lists to label\n\n")
     word_list = df[(df.rank_palabras <= threshold) |
                    (df.rank_personas <= threshold) |
                    (df.rank_palper <= threshold)]
@@ -118,10 +151,8 @@ def save_unlabeled_list(df, output_path, threshold=1000):
 
 
 def save_info_by_provinces(df, output_path):
-    print("Generating additional lists")
-
-    def is_prov_fnorm(col):
-        return "fnorm_" in col and "min" not in col and "max" not in col
+    print("=" * 40)
+    print("Generating additional info by provinces\n\n")
 
     fnorm_cols = ["fnorm_{}".format(prov) for prov in argentina.provinces]
     assert(len(fnorm_cols) == 23)
@@ -154,5 +185,27 @@ def save_info_by_provinces(df, output_path):
 
     print("Resumed list saved to {}".format(resumed_csv_path))
 
+
 def save_info_by_regions(df, output_path):
-    pass
+    print("=" * 40)
+    print("Generating additional info by regions\n\n")
+
+    regions = argentina.regions
+    occ_cols = ["{}_ocurrencias".format(region) for region in regions]
+    user_cols = ["{}_usuarios".format(region) for region in regions]
+    fnorm_cols = ["fnorm_{}".format(region) for region in regions]
+
+    assert(len(fnorm_cols) == 5)
+
+    extended_columns = occ_cols + ["cant_palabra"] +\
+        user_cols + ["cant_usuarios"] +\
+        fnorm_cols
+
+    extended_csv_path = os.path.join(
+        output_path,
+        "regiones_contraste_extendido.csv"
+    )
+
+    df.to_csv(extended_csv_path, columns=extended_columns)
+
+    print("List saved to {}".format(extended_csv_path))

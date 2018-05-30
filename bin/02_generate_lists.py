@@ -7,13 +7,18 @@ import fire
 import os
 from contrastes import read_occurrence_dataframe
 from contrastes.lists import (
-    add_info, save_unlabeled_list, save_info_by_provinces
+    add_info,
+    save_unlabeled_list,
+    save_info_by_provinces,
+    save_info_by_regions,
 )
 
 
 def save_lists(df, output_path):
     save_unlabeled_list(df, output_path, threshold=1000)
-    save_info_by_provinces(df, os.path.join(output_path, "complementarios/"))
+    complementary_lists_path = os.path.join(output_path, "complementarios/")
+    save_info_by_provinces(df, complementary_lists_path)
+    save_info_by_regions(df, complementary_lists_path)
 
 
 def generate_lists(
