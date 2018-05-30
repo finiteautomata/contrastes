@@ -19,7 +19,7 @@ def serialize(tweet, provincia):
     return ret
 
 
-def save_tweets_to(path_to_tweets, collection, no_samples):
+def save_tweets_to(path_to_tweets, collection, no_samples=-1):
     directories = glob.glob(os.path.join(path_to_tweets, "**/"))
 
     print(directories)
@@ -31,7 +31,9 @@ def save_tweets_to(path_to_tweets, collection, no_samples):
         print(provincia)
         # Choose a sample of them
         files = glob.glob(os.path.join(path_to_province, "*.json"))
-        files = random.sample(files, no_samples)
+
+        if no_samples > 0:
+            files = random.sample(files, no_samples)
 
         print("Consuming files {}".format(files))
 
@@ -43,7 +45,7 @@ def save_tweets_to(path_to_tweets, collection, no_samples):
             collection.insert_many(tweets)
 
 
-def generate_contexts(path_to_tweets):
+def generate_contexts(path_to_tweets, no_samples=-1):
     """
     Generate tweet database.
 
@@ -52,6 +54,9 @@ def generate_contexts(path_to_tweets):
 
     path_to_tweets: string
         Path to tweets. Should be separated in directories under the path.
+
+    no_samples: int (default=-1)
+        Number of files to load into db. If not given, loads all.
     """
 
     client = pymongo.MongoClient('localhost', 27017)
@@ -63,7 +68,7 @@ def generate_contexts(path_to_tweets):
         [('text', pymongo.TEXT)],
         default_language='spanish')
 
-    save_tweets_to(path_to_tweets, db.tweets, 10)
+    save_tweets_to(path_to_tweets, db.tweets, no_samples)
 
 
 if __name__ == '__main__':
