@@ -65,6 +65,8 @@ def _add_regional_info(df):
     df["region_min"] = df[fnorm_cols][df > 0].idxmin(axis=1)
     df["region_min"] = df["region_min"].apply(lambda w: w.split("_")[1])
 
+    region_con_palabra = (df[fnorm_cols] > 0).sum(axis=1)
+    df["region_sin_palabra"] = len(fnorm_cols) - region_con_palabra
     df["max_dif_region"] = df["fnorm_region_max"] / df["fnorm_region_min"]
 
 def _add_ival(df):
@@ -96,6 +98,10 @@ def add_info(df):
     _add_fnorm(df)
     _add_regional_info(df)
 
+
+def save_list(df, columns, path):
+    df.to_csv(path, columns=columns)
+    print("List saved to {}".format(path))
 
 
 def save_unlabeled_list(df, output_path, threshold=1000):
@@ -137,17 +143,12 @@ def save_unlabeled_list(df, output_path, threshold=1000):
 
     reordered_columns = columns + list(not_labeled.columns.difference(columns))
 
-    not_labeled.to_csv(complete_path,
-                       columns=reordered_columns)
-    print("Not labeled full list saved to {}".format(complete_path))
+    print("**Not labeled complete list**")
+    save_list(not_labeled, reordered_columns, complete_path)
     # This shuffles the dataframe
     shuffled = not_labeled.sample(frac=1).copy()
-
-    shuffled.to_csv(
-        reduced_path,
-        columns=columns
-    )
-    print("Not labeled shuffled reduced list saved to {}".format(reduced_path))
+    print("**Not labeled and reduced shuffled list**")
+    save_list(shuffled, columns, reduced_path)
 
 
 def save_info_by_provinces(df, output_path):
@@ -157,7 +158,7 @@ def save_info_by_provinces(df, output_path):
     fnorm_cols = ["fnorm_{}".format(prov) for prov in argentina.provinces]
     assert(len(fnorm_cols) == 23)
 
-    column_order = df.cant_palabras + ["cant_palabra"] +\
+    full_column_order = df.cant_palabras + ["cant_palabra"] +\
         df.cant_personas + ["cant_usuarios"] +\
         fnorm_cols + ["provincias_sin_esa_palabra"] +\
         ["fnorm_max", "prov_max", "fnorm_min", "prov_min", "max_dif"]
@@ -166,10 +167,6 @@ def save_info_by_provinces(df, output_path):
         output_path,
         "provincias_contraste_extendido.csv"
     )
-
-    df.to_csv(extended_csv_path, columns=column_order)
-
-    print("List saved to {}".format(extended_csv_path))
 
     resumed_order = [
         "fnorm_max", "prov_max", "fnorm_min", "prov_min", "max_dif",
@@ -181,9 +178,13 @@ def save_info_by_provinces(df, output_path):
         "provincias_contraste_resumido.csv"
     )
 
-    df.to_csv(resumed_csv_path, columns=resumed_order)
 
-    print("Resumed list saved to {}".format(resumed_csv_path))
+    print("** Provinces full list **")
+
+    save_list(df, full_column_order, extended_csv_path)
+
+    print("** Provinces resumed list **")
+    save_list(df, resumed_order, resumed_csv_path)
 
 
 def save_info_by_regions(df, output_path):
@@ -199,13 +200,26 @@ def save_info_by_regions(df, output_path):
 
     extended_columns = occ_cols + ["cant_palabra"] +\
         user_cols + ["cant_usuarios"] +\
-        fnorm_cols
+        fnorm_cols + ["region_sin_palabra", "fnorm_region_max", "region_max",
+                      "fnorm_region_min", "region_min", "max_dif_region"]
 
     extended_csv_path = os.path.join(
         output_path,
         "regiones_contraste_extendido.csv"
     )
 
-    df.to_csv(extended_csv_path, columns=extended_columns)
+    resumed_csv_path = os.path.join(
+        output_path,
+        "regiones_contraste_resumido.csv"
+    )
 
-    print("List saved to {}".format(extended_csv_path))
+    resumed_columns = [
+        "fnorm_region_max", "fnorm_region_min",
+        "region_max", "region_min",
+        "cant_usuarios", "region_sin_palabra", "max_dif_region"
+    ]
+
+    print("** Regions extended list **")
+    save_list(df, extended_columns, extended_csv_path)
+    print("** Regions resumed list **")
+    save_list(df, resumed_columns, resumed_csv_path)
