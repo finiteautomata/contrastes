@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import re
 from .information_value import information_value
 from .geo import places, region
 from . import argentina
@@ -99,8 +100,15 @@ def add_info(df):
     _add_regional_info(df)
 
 
-def save_list(df, columns, path):
-    df.to_csv(path, columns=columns)
+def save_list(df, columns, path, format='csv'):
+    if format == 'csv':
+        df.to_csv(path, columns=columns)
+    elif format == 'xls':
+        writer = pd.ExcelWriter(path, engine='xlsxwriter')
+        df.to_excel(
+            writer, columns=columns, encoding="ISO-8859-1",
+            sheet_name='Sheet1')
+        writer.close()
     print("List saved to {}".format(path))
 
 
@@ -136,10 +144,14 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     print("Not labeled:{} palabras".format(not_labeled.shape[0]))
     print("Those of which {} are places".format(sum(not_labeled.es_lugar)))
 
-    complete_path = os.path.join(output_path,
-                                 "1000_no_etiquetadas_completo.csv")
-    reduced_path = os.path.join(output_path,
-                                "1000_no_etiquetadas_random_reducido.csv")
+    complete_path = os.path.join(
+        output_path,
+        "1000_no_etiquetadas_completo.csv"
+    )
+    reduced_path = os.path.join(
+        output_path,
+        "1000_no_etiquetadas_random_reducido.xls"
+    )
 
     reordered_columns = columns + list(not_labeled.columns.difference(columns))
 
@@ -148,7 +160,7 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     # This shuffles the dataframe
     shuffled = not_labeled.sample(frac=1).copy()
     print("**Not labeled and reduced shuffled list**")
-    save_list(shuffled, columns, reduced_path)
+    save_list(shuffled, columns, reduced_path, format="xls")
 
 
 def save_info_by_provinces(df, output_path):
@@ -165,7 +177,7 @@ def save_info_by_provinces(df, output_path):
 
     extended_csv_path = os.path.join(
         output_path,
-        "provincias_contraste_extendido.csv"
+        "provincias_contraste_extendido.xls"
     )
 
     resumed_order = [
@@ -175,16 +187,16 @@ def save_info_by_provinces(df, output_path):
 
     resumed_csv_path = os.path.join(
         output_path,
-        "provincias_contraste_resumido.csv"
+        "provincias_contraste_resumido.xls"
     )
 
 
     print("** Provinces full list **")
 
-    save_list(df, full_column_order, extended_csv_path)
+    save_list(df, full_column_order, extended_csv_path, format="xls")
 
     print("** Provinces resumed list **")
-    save_list(df, resumed_order, resumed_csv_path)
+    save_list(df, resumed_order, resumed_csv_path, format="xls")
 
 
 def save_info_by_regions(df, output_path):
@@ -205,12 +217,12 @@ def save_info_by_regions(df, output_path):
 
     extended_csv_path = os.path.join(
         output_path,
-        "regiones_contraste_extendido.csv"
+        "regiones_contraste_extendido.xls"
     )
 
     resumed_csv_path = os.path.join(
         output_path,
-        "regiones_contraste_resumido.csv"
+        "regiones_contraste_resumido.xls"
     )
 
     resumed_columns = [
@@ -220,6 +232,6 @@ def save_info_by_regions(df, output_path):
     ]
 
     print("** Regions extended list **")
-    save_list(df, extended_columns, extended_csv_path)
+    save_list(df, extended_columns, extended_csv_path, format="xls")
     print("** Regions resumed list **")
-    save_list(df, resumed_columns, resumed_csv_path)
+    save_list(df, resumed_columns, resumed_csv_path, format="xls")
