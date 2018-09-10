@@ -12,7 +12,6 @@ gitdb2==2.0.3
 GitPython==2.1.8
 heapy==0.6
 html5lib==1.0.1
-hunspell==0.5.4
 idna==2.6
 ijson==2.3
 ipdb==0.11
