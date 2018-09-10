@@ -20,7 +20,10 @@ $ pip install -r requirements
 3. Bajarse datos:
 
 
-* [Listado definitivo](https://docs.google.com/spreadsheets/d/1ApWSm2dxU1-AXiN3HiYP_pLCaUhKRciUNm4e_RguGwg/edit#gid=1227749228) Guardar en `data/listado_definitivo.csv`.
+* [Listado etiquetado por la academia en la primera versión](https://docs.google.com/spreadsheets/d/1ApWSm2dxU1-AXiN3HiYP_pLCaUhKRciUNm4e_RguGwg/edit#gid=1227749228) Guardar en `data/listado_definitivo.csv`
+
+* [Palabras etiquetadas en segunda instancia](https://docs.google.com/spreadsheets/d/1iPHNdFgMihJKSY0GOAsPko0dfgNdSEWVKIqwe1hOe8Y/edit#gid=1357621277) Guardar en `data/listado_definitivo_2.csv`
+
 
 
 
@@ -31,6 +34,8 @@ $ pip install -r requirements
 ```
 $ python bin/01_generate_matrices.py
 ```
+
+Luego de ejecutar este comando, obtenemos en `output/provinces_words.csv` el listado.
 
 Si queremos generar una matriz de "juguete"
 
@@ -45,13 +50,13 @@ $ python bin/01_generate_matrices.py --num-files 4 --output-path "output/test.cs
 $ python bin/02_generate_lists.py
 ```
 
+Luego de esto, queda output/
 
 3. Generar base de datos de contextos
 
 ```
 $ python bin/03_generate_contexts.py --path-to-tweets /path/to/tweets/
 ```
-
 
 
 
