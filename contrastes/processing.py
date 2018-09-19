@@ -9,7 +9,7 @@ from nltk.tokenize import TweetTokenizer
 from nltk import FreqDist
 
 
-tokenizer = TweetTokenizer(
+_tokenizer = TweetTokenizer(
     preserve_case=False,
     reduce_len=True,
     strip_handles=True
@@ -19,7 +19,7 @@ urls = r'(?:https?\://t.co/[\w]+)'
 
 
 def tokenize(text, only_alpha=True, remove_hashtags=True):
-    tokens = tokenizer.tokenize(text)
+    tokens = _tokenizer.tokenize(text)
 
     if only_alpha:
         tokens = [tk for tk in tokens if tk.isalpha()]
