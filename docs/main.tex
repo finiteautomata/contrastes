@@ -31,8 +31,9 @@
 \usepackage[english]{babel}
 \usepackage[style=american]{csquotes}
 \usepackage[]{tacl2018v2}
+\usepackage{subcaption}
 \usepackage{graphicx}
-
+\usepackage{tabularx}
 
 %%%% Material in this block is specific to generating TACL instructions
 \usepackage{xspace,mfirstuc,tabulary}
@@ -44,6 +45,9 @@
 \newif\iftaclinstructions
 \taclinstructionsfalse % AUTHORS: do NOT set this to true
 \iftaclinstructions
+\newcolumntype{H}{>{\setbox0=\hbox\bgroup}c<{\egroup}@{}}
+
+
 \renewcommand{\confidential}{}
 \renewcommand{\anonsubtext}{(No author info supplied here, for consistency with
 TACL-submission anonymization requirements)}
@@ -68,6 +72,25 @@ TACL-submission anonymization requirements)}
 %%%% End TACL-instructions-specific macro block
 %%%%
 
+\newcommand{\wordentropy}{\emph{Word-Count Entropy}}
+\newcommand{\userentropy}{\emph{User-Count Entropy}}
+
+
+\newcommand{\wordmetric}{\emph{Word-Count Metric}}
+\newcommand{\usermetric}{\emph{User-Count Metric}}
+\newcommand{\mixedmetric}{\emph{Mixed Metric}}
+
+\newcommand{\wordrank}[1]{\emph{Word-Count%
+    \ifthenelse{\equal{#1}{*}}{}{ Ranking}%
+}}
+\newcommand{\userrank}[1]{\emph{User-Count%
+    \ifthenelse{\equal{#1}{*}}{}{ Ranking}%
+}}
+\newcommand{\mixedrank}[1]{\emph{Mixed%
+    \ifthenelse{\equal{#1}{*}}{}{ Ranking}%
+}}
+
+% \newcommand{\anonimizar}[1]{XXXXX}
 
 %% Include all macros below
 
@@ -82,7 +105,7 @@ TACL-submission anonymization requirements)}
 % Replacing that command with "\taclpubformatcopy" reveals the author info in the
 % generated pdf.
 % See tacl2018.sty for other ways to set author info.
-% El orden de los autores será Pérez, Aleman, Gravano, Kalinowski
+
 \author{
  Template Author\Thanks{The {\em actual} contributors to this instruction
  document and corresponding template file are given in Section
@@ -113,11 +136,8 @@ TACL-submission anonymization requirements)}
 \subsection*{Data}
 \input{src/data.tex}
 
-\subsection*{Metrics}
-\input{src/metrics.tex}
-
-\subsection*{Lexicographic Validation}
-\input{src/validation.tex}
+\subsection*{Method}
+\input{src/method.tex}
 
 \section{Results}
 \input{src/results.tex}
@@ -127,24 +147,6 @@ TACL-submission anonymization requirements)}
 \section{Conclusions}
 \input{src/conclusions.tex}
 
-
-
-\section{Contributors to this document}
-\label{sec:contributors}
-
-This document was adapted by Lillian Lee and Kristina Toutanova
-from the instructions and files for ACL 2018, by Shay Cohen, Kevin Gimpel, and
-Wei Lu. Those files were drawn from earlier *ACL proceedings, including those
-for ACL 2017 by Dan Gildea and Min-Yen Kan, NAACL 2017 by Margaret Mitchell,
-ACL 2012 by Maggie Li and Michael White, those from ACL 2010 by Jing-Shing
-Chang and Philipp Koehn, those for ACL 2008 by Johanna D. Moore, Simone
-Teufel, James Allan, and Sadaoki Furui, those for ACL 2005 by Hwee Tou Ng and
-Kemal Oflazer, those for ACL 2002 by Eugene Charniak and Dekang Lin, and
-earlier ACL and EACL formats,  which were written by several people,
-including John Chen, Henry S. Thompson and Donald Walker. Additional elements
-were taken from the formatting instructions of the {\em International Joint
-Conference on Artificial   Intelligence} and the \emph{Conference on Computer
-Vision and Pattern Recognition}.
 
 
 \bibliography{tacl2018}

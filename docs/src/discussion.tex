@@ -1,7 +1,22 @@
+% Dejo la formulación original...
+%Although there are no other projects that provide a comparison term to assess the degree of success involved in this task, there is no doubt that, at least in the detection of regionalisms currently in use, this work poses a real point of inflection for contrastive lexicography. This area of the lexicon is the most elusive, since its impact on any printed medium arrives noticeably later and, even more importantly, in most cases it never reaches it at all. Several words that are already included in the Dictionary of the Speech of Argentines \cite {academia2008diccionario} were included as relevant, given that this fact is an additional confirmation of the relevance of the location that the metric assigned.
 
-Although there are no other projects that provide a comparison term to assess the degree of success involved in this relationship, there is no doubt that, at least in the detection of local colloquialisms \todo{cambiar a "regionalism"}currently in use, the tool poses a real point of inflection for contrastive lexicography. This area of the lexicon is just the most elusive, since its impact on any printed medium arrives noticeably later and, even more important, in most cases it never reaches. Several words that are already included in the Dictionary of the Speech of Argentines \cite {academia2008diccionario} were included as relevant, given that this fact is an additional confirmation of the relevance of the location that assigned the metric.
+
+The proposed method presents a significant advance in the field of contrastive lexicography. This area of the lexicon is most elusive, since its impact on any printed medium arrives noticeably late -- and in many cases it never reaches it at all. Colloquialisms are a class of words hardly found in any other media. Our best performing metric (\usermetric{}) marked as relevant several words that were already listed in the \emph{Diccionario del Habla de los Argentinos} \cite {academia2008diccionario}, a fact that  confirms the usefulness of both our metric and Social Media data in general for this task. Very recent work \cite{jimenez2018automatic} arrives at the same conclusion by comparing regionalisms found in Twitter to those in handcrafted websites dedicated to colloquialisms.\footnote{For instance, \url{https://www.asihablamos.com/}}
+
+An outstanding subgroup found in the analysis are words coming from the \textit{guaranitic} region, in Northeastern Argentina. In particular, three words 
+have been proposed for addition 
+%%were added  %%anonimizacion, cambiar en la version final
+to the aforementioned dictionary: \emph{angá, angaú, mitaí}. This case is emblematic because it shows how this type of approach can help overcome the intrinsic limitations of doing regional lexicography. When lexicographers are native to only one of the different dialects of the region included in a projected dictionary, the probability of properly detecting and defining words of other dialects is slim or depends on mere chance. As the team of lexicographers expressed when confronted with these three words related to Guaraní heritage, those very robust normalized frequencies across a significant portion of the territory of Argentina would otherwise have remained unknown. Instead of including them in the next edition of the dictionary that attempts to describe all regional lexical items in the country, they would have remained unregistered, thus perpetuating a very serious omission.
 
 
-It is worth mentioning that words coming from \emph{guaraní} —language spoken in Northern Argentina, Paraguay, Bolivia and Southwest of Brazil— coincide with the region delimited by \cite{vidal1964espanol}. An example of this phenomenon are the words \textit{angá}, \textit{angaú} y \textit{mitaí}.
+Of the three proposed metrics, \usermetric{} proved to be the more interesting. It removed from the top positions words coming from automatic agents or from small niches of users, and lexicographic validation confirmed that this ranking contained more regionalisms than the others. \mixedmetric{} contained no more information than the \usermetric{}, as words with high values of this metric also had high values of \wordmetric{}. Thus, observing the users of a certain word is a very informative indicator, backing what was already found in previous work to detect spam on Twitter\cite{Cui:2012:DBE:2396761.2398519}.
 
-- Agregar que esto aplica no sólo a encontrar regionalismos sino temas/términos que sean propios de una región geográfica particular (marketing, ver penetración de una marca como en una de las citas).
+%Weaknesses
+
+
+Spatial granularity is something to be improved in future work. Limitations of the Twitter API led us to use provinces as our unit of study, but a more precise gathering of the data could reduce it to cities or towns, which would be desirable as some provinces share more than one dialect \cite{vidal1964espanol}. Also, it would be desirable to identify toponyms and proper names automatically, still a difficult task on user-generated texts such as Twitter. 
+
+
+
+

@@ -3,14 +3,6 @@
 ###################################################################################
 ###################################################################################
 
-Introduction.
-
-# Dialectology
-
-- What is it: study of variations of languages
-- Isoglosses: regions where a dialect is used
-
-## Computational Dialectology
 
 
 - "Computational Dialectology in Gaelic": https://dl.acm.org/citation.cfm?id=976983
