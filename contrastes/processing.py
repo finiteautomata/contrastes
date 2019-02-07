@@ -148,3 +148,45 @@ def read_occurrence_dataframe(path, filter_words=None):
     df.cant_personas = cant_personas
 
     return df
+
+def build_dataframe_from_users(users):
+    """
+    Build dataframe from users.
+
+    Arguments:
+    ---------
+
+
+    """
+
+    def get_bow(user):
+        bow = {}
+
+        tokens = tokenize(user["text"])
+        for token in tokens:
+            bow[token] = bow.get(token, 0) + 1
+        return bow
+
+    columns = {}
+
+    for user in users:
+        bow = get_bow(user)
+        province = user["provincia"]
+
+        occ_column = province + "_ocurrencias"
+        user_column = province + "_usuarios"
+
+        if occ_column not in columns:
+            columns[occ_column] = {}
+            columns[user_column] = {}
+
+        for tok, count in bow.items():
+            columns[occ_column][tok] = columns[occ_column].get(tok, 0) + count
+            columns[user_column][tok] = columns[user_column].get(tok, 0) + 1
+
+
+    df = pd.DataFrame.from_dict(columns)
+
+    df.fillna(0, inplace=True)
+    df.fillna(0, inplace=True)
+    return df
