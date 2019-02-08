@@ -37,8 +37,8 @@ $ python bin/01_generate_matrices.py
 
 Luego de ejecutar este comando, obtenemos en `output/provinces_words.csv` el listado.
 
-Si queremos generar una matriz de "juguete"
 
+Obs: Si queremos generar una matriz de "juguete"
 
 ```
 $ python bin/01_generate_matrices.py --num-files 4 --output-path "output/test.csv"
@@ -50,7 +50,7 @@ $ python bin/01_generate_matrices.py --num-files 4 --output-path "output/test.cs
 $ python bin/02_generate_lists.py
 ```
 
-Luego de esto, queda output/
+Luego de esto, queda `output/
 
 3. Generar base de datos de contextos
 

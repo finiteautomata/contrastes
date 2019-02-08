@@ -1,4 +1,2 @@
-
-import re
-import pandas as pd
-from .processing import read_occurrence_dataframe
+"""Entrypoint to contrastes module"""
+from .io import read_occurrence_dataframe
