@@ -5,29 +5,8 @@ import multiprocessing
 import pandas as pd
 from contextlib import closing
 from collections import defaultdict
-from nltk.tokenize import TweetTokenizer
 from nltk import FreqDist
-
-
-_tokenizer = TweetTokenizer(
-    preserve_case=False,
-    reduce_len=True,
-    strip_handles=True
-)
-
-urls = r'(?:https?\://t.co/[\w]+)'
-
-
-def tokenize(text, only_alpha=True, remove_hashtags=True):
-    tokens = _tokenizer.tokenize(text)
-
-    if only_alpha:
-        tokens = [tk for tk in tokens if tk.isalpha()]
-    else:
-        if remove_hashtags:
-            tokens = [tk for tk in tokens if tk[0] != "#"]
-        tokens = [tk for tk in tokens if not re.match(urls, tk)]
-    return tokens
+from .text import tokenize
 
 
 def get_counters(tweets):
@@ -112,8 +91,8 @@ def build_province_df(province_name, jsons, no_workers=4):
 
     return df
 
-    df.cant_palabras = cant_palabras
-    df.cant_personas = cant_personas
+    df.columnas_palabras = cant_palabras
+    df.columnas_personas = cant_personas
 
     return df
 
@@ -157,4 +136,46 @@ def build_dataframe_from_users(users):
 
     df.fillna(0, inplace=True)
     df.fillna(0, inplace=True)
+    return df
+
+
+def preprocess_raw_df(df, filter_words=None):
+    """
+    Adds a number of useful columns to an occurrence DataFrame
+
+    Also, filter words.
+
+    Arguments
+    ---------
+
+    df: pandas.DataFrame
+
+    filter_words: Bool or tuple (no_occurrences, no_users)
+
+    Returns
+    -------
+
+    df: pandas.DataFrame
+    """
+    cant_palabras = [c for c in df.columns if re.match(r'.*ocurrencias$', c)]
+    cant_personas = [c for c in df.columns if re.match(r'.*usuarios$', c)]
+
+    df["cant_provincias"] = (df[cant_palabras] > 0).sum(axis=1)
+    df["cant_palabra"] = df[cant_palabras].sum(axis=1)
+    df["cant_usuarios"] = df[cant_personas].sum(axis=1)
+
+    df = df.loc[df.index.notnull()]
+
+    if filter_words:
+        min_words, min_users = 40, 25
+        if isinstance(filter_words, tuple):
+            min_words = filter_words[0]
+            min_users = filter_words[1]
+
+        df = df[(df["cant_palabra"] >= min_words) &
+                (df["cant_usuarios"] >= min_users)]
+
+    df.columnas_palabras = cant_palabras
+    df.columnas_personas = cant_personas
+
     return df
