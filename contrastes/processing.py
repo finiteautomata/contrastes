@@ -103,7 +103,14 @@ def build_dataframe_from_users(users):
     Arguments:
     ---------
 
+    users: Iterable of dicts having "text" key
 
+    Returns:
+    --------
+
+    df: pandas.DataFrame
+
+        DataFrame of occurrences of words in provinces
     """
 
     def get_bow(user):
