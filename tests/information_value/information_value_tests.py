@@ -30,3 +30,24 @@ class InformationValueTest(unittest.TestCase):
         norm = np.log(10) / np.log(15)
 
         self.assertAlmostEqual(ret["wother"], norm * delta)
+
+
+class NormalizedInformationValueTest(unittest.TestCase):
+    def setUp(self):
+        self.df = pd.DataFrame([
+            {"word": "w1", "total": 14, "p1": 2, "p2": 10, "p3": 2},
+            {"word": "w2", "total": 2,  "p1": 2, "p2": 0, "p3": 0},
+            {"word": "w3", "total": 10, "p1": 0, "p2": 10, "p3": 0},
+            {"word": "w4", "total": 2, "p1": 0, "p2": 0, "p3": 2},
+        ])
+        self.df.set_index("word", inplace=True)
+
+    def test_for_min(self):
+        ret = information_value(self.df, "total", ["p1", "p2", "p3"],
+                                normalize=True)
+        self.assertAlmostEqual(ret["w1"], 0)
+
+    def test_for_max(self):
+        ret = information_value(self.df, "total", ["p1", "p2", "p3"],
+                                normalize=True)
+        self.assertAlmostEqual(ret["w2"], (np.log(2) / np.log(14)) * np.log(3))

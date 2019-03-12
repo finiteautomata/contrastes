@@ -47,8 +47,13 @@ def shuffled_entropy(n, p):
     return entropy(shuffled_words)
 
 
-def information_value(df, occurrence_column, columns):
-    entr = df[columns].apply(entropy, axis=1, raw=True)
+def information_value(df, occurrence_column, columns, normalize=False):
+    data = df[columns]
+
+    if normalize:
+        data = data / data.sum(axis=0)
+
+    entr = data.apply(entropy, axis=1, raw=True)
     delta = np.log(len(columns)) - entr
 
     log_occ = np.log(df[occurrence_column])

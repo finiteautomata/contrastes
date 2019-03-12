@@ -71,12 +71,16 @@ def _add_regional_info(df):
     df["max_dif_region"] = df["fnorm_region_max"] / df["fnorm_region_min"]
 
 
-def add_ival(df):
+def add_ival(df, normalize=False):
     print("Calculating information values...")
-    df["ival_palabras"] = information_value(df, "cant_palabra",
-                                            df.columnas_palabras)
-    df["ival_personas"] = information_value(df, "cant_usuarios",
-                                            df.columnas_palabras)
+    df["ival_palabras"] = information_value(
+        df, "cant_palabra", df.columnas_palabras, normalize=normalize
+    )
+
+    df["ival_personas"] = information_value(
+        df, "cant_usuarios", df.columnas_personas, normalize=normalize
+    )
+
     df["ival_palper"] = df["ival_palabras"] * df["ival_personas"]
 
     print("Calculating ranks...")
@@ -85,11 +89,11 @@ def add_ival(df):
     df["rank_palper"] = df["ival_palper"].rank(ascending=False)
 
 
-def add_info(df):
+def add_info(df, normalize=False):
     """
     Add information value and other stuff
     """
-    add_ival(df)
+    add_ival(df, normalize=normalize)
 
     no_provincias = len(df.columnas_palabras)
 
