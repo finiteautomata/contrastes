@@ -361,3 +361,4 @@ TSWLatexianTemp*
 # standalone packages
 *.sta
 
+*.pkl
