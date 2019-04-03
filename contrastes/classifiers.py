@@ -15,14 +15,22 @@ _y_test = None
 
 _province_encoder = None
 
+_default_clf_params = {
+    "multi_class": 'multinomial', 
+    "solver": 'saga', 
+    "penalty": 'l2', 
+    "max_iter": 250,
+}
+
+_clf_params = {}
+
 def _fit_clf(num_words):
     print("Entrenando con {} palabras".format(num_words))
     X_tr = _X_train[:, :num_words]
     X_tst = _X_test[:, :num_words]
-
+    
     clf = LogisticRegression(
-        multi_class='multinomial', solver='saga', penalty='l2', 
-        max_iter=250
+        **_clf_params
     )
     clf.fit(X_tr, _y_train)
 
@@ -35,16 +43,22 @@ def _fit_clf(num_words):
     return {"num_words": num_words, "clf": clf, "accuracy": acc, "mean_distance": md}
     
 
-def fit_classifiers(X_train, y_train, X_test, y_test, province_encoder, range_num_words, num_jobs=3):
+def fit_classifiers(X_train, y_train, X_test, y_test, province_encoder, range_num_words, clf_params={}, num_jobs=3):
     global _X_train, _X_test
     global _y_train, _y_test
     global _province_encoder
+    global _clf_params
     
     _X_train = X_train
     _X_test = X_test
     _y_train = y_train
     _y_test = y_test
     _province_encoder = province_encoder
+    
+    _clf_params = _default_clf_params.copy()
+    _clf_params.update(clf_params)
+    
+    print("Classifier params: {}".format(_clf_params))
     
     p = Pool(num_jobs)
     
