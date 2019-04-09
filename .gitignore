@@ -362,3 +362,4 @@ TSWLatexianTemp*
 *.sta
 
 *.pkl
+*.npy
