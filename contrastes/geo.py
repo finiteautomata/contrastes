@@ -1,6 +1,8 @@
 """Geographical functions for words."""
 import nltk
 import json
+import pandas as pd
+import numpy as np
 
 
 def region(word_series, threshold=0.95):
@@ -49,3 +51,31 @@ def places():
                     lugares.add(w.lower())
 
     return lugares
+
+dist_df = pd.read_csv("../data/geoloc/distancias.csv", index_col=0)
+
+
+def mean_distance_score(clf, X, y, province_encoder):
+    """
+    Calculate mean distance score
+    
+    Arguments
+    ---------
+    
+    clf: object responding to predict
+        Classifier already fit
+    X: np.array
+        Instances
+    y: np.array
+        Labels
+    province_encoder: sklearn.LabelEncoder
+        LabelEncoder to decode 
+    """
+    def prov_dist(p1, p2):
+        return dist_df[p1][p2]
+    real_prov = province_encoder.inverse_transform(y)
+    pred_prov = province_encoder.inverse_transform(clf.predict(X))
+    
+    distances = np.array([prov_dist(p1, p2) for p1, p2 in zip(real_prov, pred_prov)])
+    return distances.mean()
+
