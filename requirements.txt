@@ -18,6 +18,8 @@ flake8==3.5.0
 funcy==1.11
 future==0.16.0
 gensim==3.6.0
+geographiclib==1.49
+geopy==1.18.1
 gitdb2==2.0.3
 GitPython==2.1.8
 heapy==0.6

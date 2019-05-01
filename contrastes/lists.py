@@ -24,7 +24,7 @@ def _fnorm(df, col):
 def _add_fnorm(df):
     print("Adding fnorms...")
     fnorm_cols = []
-    for col in df.cant_palabras:
+    for col in df.columnas_palabras:
         prov = col.split("_")[0]
 
         fnorm_col = "fnorm_{}".format(prov)
@@ -70,12 +70,17 @@ def _add_regional_info(df):
     df["region_sin_palabra"] = len(fnorm_cols) - region_con_palabra
     df["max_dif_region"] = df["fnorm_region_max"] / df["fnorm_region_min"]
 
-def _add_ival(df):
+
+def add_ival(df, normalize=False):
     print("Calculating information values...")
-    df["ival_palabras"] = information_value(df, "cant_palabra",
-                                            df.cant_palabras)
-    df["ival_personas"] = information_value(df, "cant_usuarios",
-                                            df.cant_personas)
+    df["ival_palabras"] = information_value(
+        df, "cant_palabra", df.columnas_palabras, normalize=normalize
+    )
+
+    df["ival_personas"] = information_value(
+        df, "cant_usuarios", df.columnas_personas, normalize=normalize
+    )
+
     df["ival_palper"] = df["ival_palabras"] * df["ival_personas"]
 
     print("Calculating ranks...")
@@ -84,14 +89,16 @@ def _add_ival(df):
     df["rank_palper"] = df["ival_palper"].rank(ascending=False)
 
 
-def add_info(df):
+def add_info(df, normalize=False):
     """
     Add information value and other stuff
     """
-    _add_ival(df)
+    add_ival(df, normalize=normalize)
 
-    df["provincias_sin_esa_palabra"] = 23 - df["cant_provincias"]
-    df["region"] = df[df.cant_personas].apply(region, axis=1)
+    no_provincias = len(df.columnas_palabras)
+
+    df["provincias_sin_esa_palabra"] = no_provincias - df["cant_provincias"]
+    df["region"] = df[df.columnas_personas].apply(region, axis=1)
 
     lugares = places()
     df["es_lugar"] = df.index.map(lambda w: w in lugares)
@@ -170,8 +177,8 @@ def save_info_by_provinces(df, output_path):
     fnorm_cols = ["fnorm_{}".format(prov) for prov in argentina.provinces]
     assert(len(fnorm_cols) == 23)
 
-    full_column_order = df.cant_palabras + ["cant_palabra"] +\
-        df.cant_personas + ["cant_usuarios"] +\
+    full_column_order = df.columnas_palabras + ["cant_palabra"] +\
+        df.columnas_personas + ["cant_usuarios"] +\
         fnorm_cols + ["provincias_sin_esa_palabra"] +\
         ["fnorm_max", "prov_max", "fnorm_min", "prov_min", "max_dif"]
 
