@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from .information_value import information_value
 from .geo import places, region
+from .igr import igr
 from . import argentina
 
 
@@ -13,7 +14,15 @@ def get_label():
     labeled_df = pd.read_csv("data/listado_definitivo.csv", index_col=0)
     label = labeled_df["Palabra Candidata"].copy()
     label[label == "0,5"] = "0.5"
-    return label.astype("float")
+    labels = label.astype("float")
+    
+    """
+    Get second round of annotated words
+    """
+    df2 = pd.read_csv("data/listado_definitivo_2.csv", index_col=0)
+    for idx, r in df2.iterrows():
+        labels[idx] = r['candidata']
+    return labels 
 
 
 def _fnorm(df, col):
@@ -87,14 +96,30 @@ def add_ival(df, normalize=False):
     df["rank_palabras"] = df["ival_palabras"].rank(ascending=False)
     df["rank_personas"] = df["ival_personas"].rank(ascending=False)
     df["rank_palper"] = df["ival_palper"].rank(ascending=False)
+    
 
+def add_igr(df):
+    print("Calculating Information Gain Ratio")
+    df["igr_palabras"] = igr(
+        df, df.columnas_palabras
+    )
+    
+    df["igr_personas"] = igr(
+        df, df.columnas_personas,
+    )
+    
+    print("Calculating ranks...")
+    
+    df["rank_igr_palabras"] = df["igr_palabras"].rank(ascending=False)
+    df["rank_igr_personas"] = df["igr_personas"].rank(ascending=False)
 
+    
 def add_info(df, normalize=False):
     """
     Add information value and other stuff
     """
     add_ival(df, normalize=normalize)
-
+    add_igr(df)
     no_provincias = len(df.columnas_palabras)
 
     df["provincias_sin_esa_palabra"] = no_provincias - df["cant_provincias"]
@@ -133,7 +158,10 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     print("Saving lists to label\n\n")
     word_list = df[(df.rank_palabras <= threshold) |
                    (df.rank_personas <= threshold) |
-                   (df.rank_palper <= threshold)]
+                   (df.rank_palper <= threshold)   |
+                   (df.rank_igr_palabras <= threshold) |
+                   (df.rank_igr_personas <= threshold)
+                  ]
 
     not_labeled = word_list[word_list.etiqueta.isna()].copy()
 
@@ -148,7 +176,7 @@ def save_unlabeled_list(df, output_path, threshold=1000):
     print(
         "Number of total words (without repetition): {}".format(len(word_list))
     )
-    print("Not labeled:{} palabras".format(not_labeled.shape[0]))
+    print("Not labeled:{} words".format(not_labeled.shape[0]))
     print("Those of which {} are places".format(sum(not_labeled.es_lugar)))
 
     complete_path = os.path.join(

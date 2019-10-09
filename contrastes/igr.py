@@ -6,6 +6,12 @@ from scipy.stats import entropy
 import numpy as np
 
 def igr(word_df, columns):
+    """
+    Calculates Information Gain Ratio (Han et al 2012)
+    
+    Han, Bo, Paul Cook, and Timothy Baldwin. "Geolocation prediction in social media data by finding location indicative words." Proceedings of COLING 2012. 2012.
+    
+    """
     data = word_df[columns]
     total_sum = data.sum()
     

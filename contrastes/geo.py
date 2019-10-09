@@ -52,7 +52,7 @@ def places():
 
     return lugares
 
-dist_df = pd.read_csv("../data/geoloc/distancias.csv", index_col=0)
+dist_df = pd.read_csv("data/geoloc/distancias.csv", index_col=0)
 
 
 def mean_distance_score(clf, X, y, province_encoder):
