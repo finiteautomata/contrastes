@@ -50,7 +50,7 @@ $ python bin/01_generate_matrices.py --num-files 4 --output-path "output/test.cs
 $ python bin/02_generate_lists.py
 ```
 
-Luego de esto, queda `output/
+Luego de esto, queda `output/listado_completo.csv`
 
 3. Generar base de datos de contextos
 
