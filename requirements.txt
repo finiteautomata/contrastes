@@ -97,7 +97,7 @@ testpath==0.3.1
 tornado==5.0
 traitlets==4.3.2
 -e git+git@github.com:finiteautomata/tweepyrate.git@d6be6631dc7960886ecaeee526aa6a5aec0b7a13#egg=Tweepyrate
-urllib3==1.22
+urllib3==1.26.5
 wcwidth==0.1.7
 webencodings==0.5.1
 widgetsnbextension==3.1.4
